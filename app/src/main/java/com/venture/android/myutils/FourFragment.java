@@ -59,11 +59,11 @@ public class FourFragment extends Fragment implements OnMapReadyCallback {
                 3000, // 통지사이의 최소 시간간격 (miliSecond) // 업데이트 간격
                 10, // 통지사이의 최소 변경거리 (m)
                 locationListener);
-//        // 정보제공자로 네트워크프로바이더 등록
-//        manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자
-//                3000, // 통지사이의 최소 시간간격 (miliSecond)
-//                10, // 통지사이의 최소 변경거리 (m)
-//                locationListener);
+        // 정보제공자로 네트워크프로바이더 등록
+        manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자
+                3000, // 통지사이의 최소 시간간격 (miliSecond)
+                10, // 통지사이의 최소 변경거리 (m)
+                locationListener);
 
     }
     @Override
@@ -94,9 +94,10 @@ public class FourFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        LatLng sydney = new LatLng(-34, 151);
-        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,15));
+        // 신사역 좌표
+        LatLng seoul = new LatLng(37.516066, 127.019361);
+        map.addMarker(new MarkerOptions().position(seoul).title("Sinsa in seoul"));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(seoul,17));
 
 
 
@@ -117,7 +118,7 @@ public class FourFragment extends Fragment implements OnMapReadyCallback {
             map.addMarker(new MarkerOptions().position(myPosition).title("I am here!"));
             //  내 위치             마커 타이틀
             // 화면을 내위치로 이동시키는 함수
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 10));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 17));
             // 내 위치 , 줌레벨
         }
 

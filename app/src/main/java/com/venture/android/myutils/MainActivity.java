@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -20,6 +21,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import com.venture.android.myutils.dummy.DummyContent;
+
+import java.util.Stack;
+
 /*
  * GPS 사용순서
  * 1. manifest에 FINE, COARSE 권한 추가
@@ -29,13 +34,22 @@ import android.widget.Toast;
  *
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FiveFragment.OnListFragmentInteractionListener{
 
-    final int TAB_COUNT = 4;
+    final int TAB_COUNT = 5;
     OneFragment one;
     TwoFragment two;
     ThreeFragment three;
     FourFragment four;
+    FiveFragment five;
+
+    boolean backpress=false;
+
+    private int page_position=0;
+    ViewPager viewPager;
+
+    Stack<Integer> pageStack = new Stack<>();
+
 
     // GPS 위치 정보 관리자
     private LocationManager manager;
@@ -50,11 +64,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 메써드 추적 시작 ------
+        Debug.startMethodTracing("tresult");
         // 프레그먼트 init
         one   = new OneFragment();
         two   = new TwoFragment();
         three = new ThreeFragment();
         four  = new FourFragment();
+        five  = FiveFragment.newInstance(2); //미리 정해진 그리드 갯수
 
         // 탭 Layoyt 정의
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
@@ -64,9 +81,10 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("단위환산"));
         tabLayout.addTab(tabLayout.newTab().setText("검색"));
         tabLayout.addTab(tabLayout.newTab().setText("현재위치"));
+        tabLayout.addTab(tabLayout.newTab().setText("갤러리"));
 
         // 프레그먼트 페이저 작성
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
 
         // 아답터 생성
         PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager());
@@ -74,6 +92,34 @@ public class MainActivity extends AppCompatActivity {
 
         // 페이저가 변경되었을 때 탭을 바꿔주는 리스너
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+                if(!backpress) {
+
+                    pageStack.push(page_position);
+                } else {
+                    backpress = false;
+                }
+
+                page_position = position;
+
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         // 탭이 변경되었을 때 페이지를 바꿔주는 리스너
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
 
@@ -83,6 +129,13 @@ public class MainActivity extends AppCompatActivity {
         } else {
             init();
         }
+        // 메써드 추적 종료
+        Debug.stopMethodTracing();
+    }
+
+    @Override
+    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+
     }
 
     class PagerAdapter extends FragmentStatePagerAdapter {
@@ -99,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
                 case 1: fragment = two;     break;
                 case 2: fragment = three;   break;
                 case 3: fragment = four;    break;
+                case 4: fragment = five;    break;
             }
             return fragment;
         }
@@ -117,7 +171,9 @@ public class MainActivity extends AppCompatActivity {
                 || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
                 || checkSelfPermission(Manifest.permission.INTERNET)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED){
             // 1.2 요청할 권한 목록 작성
             String permArr[] = {Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -139,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED
                     && grantResults[2] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[3] == PackageManager.PERMISSION_GRANTED
                     ){
                 init();
             } else {
@@ -195,5 +252,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        switch(page_position){
+            // webview 페이지에서
+            case 2:
+                // 뒤로 가기가 가능하면 아무런 동작을 하지 않는다.
+                if(three.goBack()){
+                // 뒤로 가기가 안되면 앱을 닫는다.
+                } else {
+                    goBackStack();
+                }
+                break;
+            // 위의 조건에 해당되지 않는 모든 케이스는 아래 로직을 처리한다.
+            default:
+                goBackStack();
+                break;
+        }
+    }
+
+    private void goBackStack() {
+        if(pageStack.size() < 1) {
+            super.onBackPressed();
+        } else {
+            backpress = true;
+            viewPager.setCurrentItem(pageStack.pop());
+        }
+    }
 
 }

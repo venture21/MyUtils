@@ -26,11 +26,16 @@ public class OneFragment extends Fragment implements View.OnClickListener {
         // Required empty public constructor
     }
 
+    View view = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // View를 재사용하기 위해 Holder 형태를 만들어준다.
+        if(view != null)
+            return view;
+
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_one, container, false);
+        view = inflater.inflate(R.layout.fragment_one, container, false);
 
         btnNum0  = (Button) view.findViewById(R.id.btn0);
         btnNum1  = (Button) view.findViewById(R.id.btn1);

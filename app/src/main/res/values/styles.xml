@@ -6,6 +6,15 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <!--TitleBar 없애기 -->
+        <item name ="windowNoTitle">true</item>
+
+        <!--StatusBar 없애기 -->
+        <item name="android:windowFullscreen">true</item>
+
     </style>
+
+
 
 </resources>
