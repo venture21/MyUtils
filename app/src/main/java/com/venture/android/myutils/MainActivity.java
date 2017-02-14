@@ -21,8 +21,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.venture.android.myutils.dummy.DummyContent;
-
 import java.util.Stack;
 
 /*
@@ -34,7 +32,7 @@ import java.util.Stack;
  *
  */
 
-public class MainActivity extends AppCompatActivity implements FiveFragment.OnListFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity {
 
     final int TAB_COUNT = 5;
     OneFragment one;
@@ -71,17 +69,17 @@ public class MainActivity extends AppCompatActivity implements FiveFragment.OnLi
         two   = new TwoFragment();
         three = new ThreeFragment();
         four  = new FourFragment();
-        five  = FiveFragment.newInstance(2); //미리 정해진 그리드 갯수
+        five  = FiveFragment.newInstance(3); //미리 정해진 그리드 갯수
 
         // 탭 Layoyt 정의
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
 
         // 탭 생성 및 타이틀 입력
-        tabLayout.addTab(tabLayout.newTab().setText("계산기"));
+        tabLayout.addTab(tabLayout.newTab().setText("계 산 기"));
         tabLayout.addTab(tabLayout.newTab().setText("단위환산"));
-        tabLayout.addTab(tabLayout.newTab().setText("검색"));
+        tabLayout.addTab(tabLayout.newTab().setText("검  색"));
         tabLayout.addTab(tabLayout.newTab().setText("현재위치"));
-        tabLayout.addTab(tabLayout.newTab().setText("갤러리"));
+        tabLayout.addTab(tabLayout.newTab().setText("갤 러 리"));
 
         // 프레그먼트 페이저 작성
         viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -133,10 +131,6 @@ public class MainActivity extends AppCompatActivity implements FiveFragment.OnLi
         Debug.stopMethodTracing();
     }
 
-    @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
-
-    }
 
     class PagerAdapter extends FragmentStatePagerAdapter {
 
@@ -172,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements FiveFragment.OnLi
                 != PackageManager.PERMISSION_GRANTED
                 || checkSelfPermission(Manifest.permission.INTERNET)
                 != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED
                 || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED){
             // 1.2 요청할 권한 목록 작성
@@ -196,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements FiveFragment.OnLi
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED
                     && grantResults[2] == PackageManager.PERMISSION_GRANTED
                     && grantResults[3] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[4] == PackageManager.PERMISSION_GRANTED
                     ){
                 init();
             } else {
@@ -278,6 +275,24 @@ public class MainActivity extends AppCompatActivity implements FiveFragment.OnLi
             backpress = true;
             viewPager.setCurrentItem(pageStack.pop());
         }
+    }
+
+    // Detail 프레그먼트에서 List로 돌아갈 때
+    public void backToList() {
+        // 스택을 빼내면 된다 - popBackStack에 해당하는 함수이다.
+        super.onBackPressed();
+
+//        // 1. 프레그먼트를 실행하기 위한 트랙잭션
+//        FragmentTransaction transaction = manager.beginTransaction();
+//
+//        // 2. detail 프레그먼트를 스택에서 제거한다.
+//        transaction.remove(detail);
+//
+//        // 3. 커밋
+//        transaction.commit();
+
+
+
     }
 
 }
